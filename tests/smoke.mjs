@@ -98,6 +98,36 @@ try {
   await p.waitForSelector('.umenu-wrap');
   check('signup creates and logs in a new account', (await p.evaluate(() => JSON.parse(localStorage.getItem('maison.web.v2')).cur)) === '9812300001');
 
+  // Profile: edit name/email, change number, preferences, delete account
+  await p.goto(BASE + "#/me");
+  await p.click(".profile-card [data-act=editprofile]");
+  await p.fill("#pf-name", "A");
+  await p.click("form[data-form=profile] button[type=submit]");
+  check("profile validates short name", /full name/i.test(await p.textContent("#pf-err")));
+  await p.fill("#pf-name", "Renamed User");
+  await p.fill("#pf-mail", "renamed@example.com");
+  await p.click("form[data-form=profile] button[type=submit]");
+  await p.waitForSelector(".profile-card h2");
+  check("profile name and email saved", (await p.textContent(".profile-card h2")) === "Renamed User" && /renamed@example.com/.test(await p.textContent(".pdl")));
+  await p.click("[data-act=umenu]");
+  check("header menu shows new name", (await p.textContent(".um-head b")) === "Renamed User");
+  await p.click(".profile-card [data-act=editprofile]");
+  await p.click("[data-act=chphone]");
+  await p.fill("#cp-in", "9812300002");
+  await p.click("form[data-form=chphone] button[type=submit]");
+  await p.fill("#cp-in", "1234");
+  await p.click("form[data-form=chphone] button[type=submit]");
+  await p.waitForSelector(".profile-card h2");
+  check("mobile number can be changed", (await p.evaluate(() => JSON.parse(localStorage.getItem("maison.web.v2")).cur)) === "9812300002");
+  const sw = p.locator("[data-k=offers]");
+  const before = await sw.getAttribute("aria-checked");
+  await sw.click();
+  check("preference toggle flips", (await sw.getAttribute("aria-checked")) !== before);
+  await p.click("[data-act=deleteacct]");
+  await p.click("[data-act=dodelete]");
+  await p.waitForSelector("a[href=\"#/signup\"]");
+  check("account can be deleted", !(await p.evaluate(() => Object.keys(JSON.parse(localStorage.getItem("maison.web.v2")).users).includes("9812300002"))));
+
   // Partner form
   await p.goto(BASE + '#/partner');
   await p.waitForSelector('form[data-form=partner]');

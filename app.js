@@ -293,10 +293,104 @@ function pgSaved(){const l=SALONS.filter(s=>S.fav.includes(s.id));return `<div c
 function pgOffers(){return `<div class="wrap" style="padding-top:26px"><h1 class="serif" style="font-size:clamp(34px,6vw,52px);line-height:1.05">Offers</h1><p class="muted" style="margin:6px 0 22px">Funded by the salons themselves and applied automatically at checkout.</p><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${SALONS.filter(s=>s.offer).map(s=>`<article class="scard"><div class="cover" style="aspect-ratio:16/8">${cover(s,1)}</div><div class="body"><div class="serif" style="font-size:36px;line-height:1;color:var(--brand)">${s.offer.type==='pct'?s.offer.v+'% off':s.offer.type==='flat'?INR(s.offer.v)+' off':'Free add-on'}</div><h3>${esc(s.offer.label)}</h3><div class="small muted">${esc(s.name)} · ${esc(s.area)}</div><div style="margin-top:auto;padding-top:12px"><a class="btn btn-primary btn-sm btn-block" href="#/salon/${s.id}">Book with offer</a></div></div></article>`).join('')}</div></div>`}
 function pgHelp(){const F=[['Is my appointment confirmed straight away?','Bookings arrive at the salon as a request. Most salons confirm within two hours during business hours, and you get a notification the moment they do.'],['Can I cancel for free?','Yes — up to 4 hours before your appointment. Later cancellations may affect your booking priority with that salon.'],['Do I pay when I book?','No. You pay at the salon after your service. Nothing is charged online.'],['How do offers work?','Eligible offers are applied automatically at the review step. You will see the saving before you confirm.'],['What if my professional is unavailable?','The salon will contact you with alternatives, or you can reschedule or cancel for free.']];
   return `<div class="wrap" style="padding-top:26px"><h1 class="serif" style="font-size:clamp(34px,6vw,52px);line-height:1.05">Help &amp; support</h1><p class="muted" style="margin:6px 0 22px">Quick answers about booking, cancellations and your account.</p>${F.map(f=>`<details class="faq"><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join('')}<div class="promo" style="margin-top:24px;grid-template-columns:1fr;min-height:0;padding:32px"><div><h2>Still stuck?</h2><p style="margin:8px 0 18px">Support replies within a few hours, 9am–9pm IST.</p><div class="row wrapflex"><a class="btn btn-primary" href="mailto:support@okomall.app">Email support</a><a class="btn" style="background:rgba(255,255,255,.12);color:#fff" href="tel:+918000000000">${ic('phone','sm')}Call us</a></div></div></div></div>`}
-function pgMe(){const u=S.user;return `<div class="wrap" style="padding-top:26px"><div class="row" style="gap:16px;margin-bottom:22px"><div class="avatar lg">${initials(u.name)}</div><div><h1 class="serif" style="font-size:38px;line-height:1.05">${esc(u.name)}</h1><div class="muted">${[u.phone,u.email].filter(Boolean).map(esc).join(' · ')}</div></div></div>
-  <div class="card"><h2 style="font-size:18px;margin-bottom:6px">Preferences</h2>${[['notify','Booking updates','Confirmations and changes by SMS and push'],['remind','Reminders','A nudge 3 hours before each appointment']].map(([k,t,d])=>`<div class="prow"><div><b>${t}</b><div class="small muted">${d}</div></div><button class="switch" role="switch" aria-checked="${!!u[k]}" aria-label="${t}" data-act="pref" data-k="${k}"></button></div>`).join('')}</div>
-  <div class="card" style="margin-top:16px"><h2 style="font-size:18px;margin-bottom:6px">Account</h2><div class="prow"><span>Saved salons</span><a class="btn-text btn" href="#/saved">${S.fav.length} saved ${ic('chev','sm')}</a></div><div class="prow"><span>My appointments</span><a class="btn-text btn" href="#/bookings">${S.bookings.length} total ${ic('chev','sm')}</a></div><div class="prow" style="border:0"><span>Help &amp; support</span><a class="btn-text btn" href="#/help">Open ${ic('chev','sm')}</a></div></div>
-  <div class="row" style="gap:10px;margin-top:20px;flex-wrap:wrap"><button class="btn btn-primary" data-act="logout">${ic('logout','sm')}Log out</button><button class="btn btn-text" data-act="reset">Reset demo data</button></div></div>`}
+/* ---------- profile ---------- */
+const avatarHTML=(u,cls='')=>(u&&u.photo)?`<span class="avatar ${cls} has-img"><img src="${u.photo}" alt=""></span>`:`<span class="avatar ${cls}">${esc(initials((u&&u.name)||'U'))}</span>`;
+let pfPhoto;   // undefined = unchanged, '' = removed, data URL = new photo
+let cp={step:1,phone:''};
+function profileSheet(){
+  const u=S.user;pfPhoto=undefined;
+  sheet(`<h2>Edit profile</h2><p class="muted" style="margin:4px 0 6px">Your name is shown to salons when you book.</p><form data-form="profile" novalidate>
+   <div class="pf-photo"><div id="pf-av">${avatarHTML(u,'lg')}</div><div class="pf-photo-btns"><label class="btn btn-ghost btn-sm" for="pf-file">${ic('plus','sm')}Change photo</label><input id="pf-file" type="file" accept="image/*" data-act="photo" hidden><button type="button" class="btn btn-text btn-sm" data-act="rmphoto">Remove</button></div></div>
+   <label class="flabel" for="pf-name">Full name</label><input id="pf-name" class="finput" name="name" value="${esc(u.name)}" autocomplete="name" maxlength="60">
+   <label class="flabel" for="pf-mail">Email <span class="muted">(optional)</span></label><input id="pf-mail" class="finput" name="email" type="email" value="${esc(u.email||'')}" autocomplete="email">
+   <div class="g2f"><div><label class="flabel" for="pf-dob">Date of birth <span class="muted">(optional)</span></label><input id="pf-dob" class="finput" name="dob" type="date" value="${esc(u.dob||'')}" max="${iso(new Date())}"></div>
+   <div><label class="flabel" for="pf-gender">Gender <span class="muted">(optional)</span></label><select id="pf-gender" class="finput" name="gender">${['','Female','Male','Non-binary','Prefer not to say'].map(g=>`<option value="${g}"${(u.gender||'')===g?' selected':''}>${g||'Select'}</option>`).join('')}</select></div></div>
+   <div class="flabel">Mobile number</div><div class="pf-phone"><span>${esc(u.phone)}</span><button type="button" class="link" data-act="chphone">Change</button></div>
+   <div id="pf-err" class="ferr" role="alert" hidden></div>
+   <div class="row" style="gap:10px;margin-top:20px"><button type="button" class="btn btn-ghost" style="flex:1" data-act="closeSheet">Cancel</button><button class="btn btn-primary" style="flex:1" type="submit">Save changes</button></div></form>`,'Edit profile');
+}
+function handlePhoto(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  const err=m=>{const e=$('#pf-err');if(e){e.textContent=m;e.hidden=false}};
+  if(!/^image\//.test(f.type))return err('Please choose an image file.');
+  if(f.size>8*1024*1024)return err('That image is too large (max 8 MB).');
+  const r=new FileReader();
+  r.onload=()=>{const im=new Image();im.onload=()=>{
+    const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;
+    c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);
+    pfPhoto=c.toDataURL('image/jpeg',.85);const box=$('#pf-av');if(box)box.innerHTML=avatarHTML({photo:pfPhoto},'lg');
+    const e=$('#pf-err');if(e)e.hidden=true};
+    im.onerror=()=>err('That image could not be read.');im.src=r.result};
+  r.onerror=()=>err('That image could not be read.');
+  r.readAsDataURL(f);
+}
+function profileSubmit(f){
+  const d=Object.fromEntries(new FormData(f)),u=S.user;
+  const err=(m,field)=>{const e=$('#pf-err');e.textContent=m;e.hidden=false;const x=field&&f.querySelector('[name="'+field+'"]');if(x){x.setAttribute('aria-invalid','true');x.focus()}};
+  $$('[aria-invalid]',f).forEach(x=>x.removeAttribute('aria-invalid'));
+  const name=(d.name||'').trim().replace(/\s+/g,' ');
+  if(name.length<2)return err('Please enter your full name.','name');
+  const email=(d.email||'').trim();
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return err('Enter a valid email address or leave it empty.','email');
+  if(d.dob&&d.dob>iso(new Date()))return err('Date of birth cannot be in the future.','dob');
+  u.name=name;u.email=email;u.dob=d.dob||'';u.gender=d.gender||'';
+  if(pfPhoto!==undefined){if(pfPhoto)u.photo=pfPhoto;else delete u.photo}
+  if(draft)draft.name=name;
+  save();closeSheet();toast('Profile updated');route();
+}
+function phoneSheet(){
+  const otp=cp.step===2;
+  sheet(`<h2>${otp?'Verify new number':'Change mobile number'}</h2><p class="muted" style="margin:4px 0 6px">${otp?`Enter the 4-digit code sent to <b>${esc(fmtPh(cp.phone))}</b>.`:'You will log in with your new number from now on.'}</p>
+  <form data-form="chphone" novalidate>${otp?`<label class="flabel" for="cp-in">Verification code</label><input id="cp-in" class="finput otp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="••••"><div class="hint">Demo code: <b>1234</b></div>`
+   :`<div class="flabel">Current number</div><div class="pf-phone"><span>${esc(S.user.phone)}</span></div><label class="flabel" for="cp-in">New mobile number</label><div class="phone-in"><span>+91</span><input id="cp-in" name="ph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" value="${esc(cp.phone)}"></div>`}
+   <div id="pf-err" class="ferr" role="alert" hidden></div>
+   <div class="row" style="gap:10px;margin-top:20px"><button type="button" class="btn btn-ghost" style="flex:1" data-act="${otp?'chphone-back':'editprofile'}">${otp?'Back':'Cancel'}</button><button class="btn btn-primary" style="flex:1" type="submit">${otp?'Verify & update':'Send code'}</button></div></form>`,'Change mobile number');
+  const i=$('#cp-in');if(i)i.focus();
+}
+function phoneSubmit(f){
+  const d=Object.fromEntries(new FormData(f));
+  const err=m=>{const e=$('#pf-err');e.textContent=m;e.hidden=false;const i=$('#cp-in');if(i){i.setAttribute('aria-invalid','true');i.focus()}};
+  if(cp.step===1){
+    const n=k10(d.ph);cp.phone=n;
+    if(!/^[6-9]\d{9}$/.test(n))return err('Enter a valid 10-digit mobile number.');
+    if(n===S.cur)return err('That is already your number.');
+    if(S.users[n])return err('That number is already used by another account.');
+    cp.step=2;phoneSheet();
+  }else{
+    if((d.otp||'').trim()!=='1234')return err('That code is not right. Use 1234 in this demo.');
+    const old=S.cur,n=cp.phone;save();
+    S.users[n]=S.users[old];delete S.users[old];S.cur=n;S.user.phone=fmtPh(n);
+    if(draft)draft.phone=S.user.phone;
+    cp={step:1,phone:''};save();closeSheet();toast('Mobile number updated');route();
+  }
+}
+function deleteSheet(){
+  sheet(`<h2>Delete your account?</h2><p class="muted" style="margin:6px 0 20px">This permanently removes your profile, appointments and saved salons from this device. You can sign up again any time.</p>
+  <div class="row" style="gap:10px"><button class="btn btn-ghost" style="flex:1" data-act="closeSheet">Keep my account</button><button class="btn btn-danger" style="flex:1" data-act="dodelete">Delete account</button></div>`,'Delete account');
+}
+function doDelete(){
+  const k=S.cur;if(k&&S.users)delete S.users[k];
+  S.cur=null;S.user=GUEST();S.fav=[];S.bookings=[];draft=null;bTab='upcoming';au=fresh();save();closeSheet();
+  toast('Your account was deleted');
+  if(location.hash==='#/'||location.hash==='')route();else location.hash='#/';
+}
+function pgMe(){
+  const u=S.user;
+  const since=u.since?new Date(u.since).toLocaleDateString('en-IN',{month:'long',year:'numeric'}):'';
+  const prefs=[['notify','Booking updates','Confirmations and changes by SMS and push'],['remind','Reminders','A nudge 3 hours before each appointment'],['offers','Offers & news','Weekly offers from salons near you']];
+  const on=k=>k==='offers'?u.offers!==false:!!u[k];
+  const details=[['Mobile',u.phone],['Email',u.email||'Not added'],['Date of birth',u.dob?new Date(u.dob+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'Not added'],['Gender',u.gender||'Not added']];
+  return `<div class="wrap" style="padding-top:26px"><h1 class="serif" style="font-size:clamp(34px,6vw,52px);line-height:1.05;margin-bottom:22px">Account</h1>
+  <div class="me-grid"><aside class="card profile-card"><div class="pc-av">${avatarHTML(u,'xl')}</div><h2>${esc(u.name)}</h2>${since?`<div class="xs muted">Member since ${since}</div>`:''}
+    <div class="pc-stats"><a href="#/bookings"><b>${S.bookings.length}</b><span>Appointments</span></a><a href="#/saved"><b>${S.fav.length}</b><span>Saved</span></a></div>
+    <button class="btn btn-primary btn-block" data-act="editprofile">${ic('user','sm')}Edit profile</button></aside>
+   <div class="me-col">
+    <div class="card"><div class="row between" style="margin-bottom:6px"><h2 style="font-size:18px">Personal details</h2><button class="btn btn-text btn-sm" data-act="editprofile">Edit</button></div><dl class="pdl">${details.map(([k,v])=>`<div><dt>${k}</dt><dd${/^Not added$/.test(v)?' class="muted"':''}>${esc(v)}</dd></div>`).join('')}</dl></div>
+    <div class="card"><h2 style="font-size:18px;margin-bottom:6px">Preferences</h2>${prefs.map(([k,t,dd])=>`<div class="prow"><div><b>${t}</b><div class="small muted">${dd}</div></div><button class="switch" role="switch" aria-checked="${on(k)}" aria-label="${t}" data-act="pref" data-k="${k}"></button></div>`).join('')}</div>
+    <div class="card"><h2 style="font-size:18px;margin-bottom:6px">Shortcuts</h2><div class="prow"><span>Saved salons</span><a class="btn-text btn" href="#/saved">${S.fav.length} saved ${ic('chev','sm')}</a></div><div class="prow"><span>My appointments</span><a class="btn-text btn" href="#/bookings">${S.bookings.length} total ${ic('chev','sm')}</a></div><div class="prow" style="border:0"><span>Help &amp; support</span><a class="btn-text btn" href="#/help">Open ${ic('chev','sm')}</a></div></div>
+    <div class="card"><h2 style="font-size:18px;margin-bottom:12px">Session</h2><div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn btn-ghost" data-act="logout">${ic('logout','sm')}Log out</button><button class="btn btn-danger" data-act="deleteacct">Delete account</button><button class="btn btn-text" data-act="reset">Reset demo data</button></div></div>
+   </div></div></div>`;
+}
 function nf(){return `<div class="wrap"><div class="empty" style="margin-top:40px"><h2 class="serif" style="font-size:34px">Page not found</h2><p class="muted" style="margin:8px 0 16px">That page doesn’t exist.</p><a class="btn btn-primary" href="#/">Back home</a></div></div>`}
 
 
@@ -309,7 +403,7 @@ const safeNext=n=>(typeof n==='string'&&/^#\//.test(n)&&!/^#\/(login|signup)/.te
 function needLogin(msg,icon,fav,next,resume){au.next=next||(location.hash&&location.hash!=='#'?location.hash:'#/');au.resume=resume||0;au.pendFav=fav||null;au.msg=msg;au.mode='login';au.step='phone';toast(msg,icon||'user');location.hash='#/login?next='+encodeURIComponent(au.next)}
 function authBits(){
   if(!S.cur)return `<a class="btn btn-ghost btn-sm hide-sm" href="#/login">Log in</a><a class="btn btn-primary btn-sm" href="#/signup">Sign up</a>`;
-  return `<div class="umenu-wrap"><button class="avatar-btn" data-act="umenu" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu"><span class="avatar">${esc(initials(S.user.name||'U'))}</span></button>
+  return `<div class="umenu-wrap"><button class="avatar-btn" data-act="umenu" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu">${avatarHTML(S.user)}</button>
   <div class="umenu" id="umenu" role="menu" hidden><div class="um-head"><b>${esc(S.user.name)}</b><span>${esc(S.user.phone)}</span></div><a role="menuitem" href="#/bookings">${ic('cal','sm')}My appointments</a><a role="menuitem" href="#/saved">${ic('heart','sm')}Saved salons</a><a role="menuitem" href="#/me">${ic('user','sm')}Account settings</a><button role="menuitem" data-act="logout">${ic('logout','sm')}Log out</button></div></div>`;
 }
 function pgAuth(mode){
@@ -350,7 +444,7 @@ function authSubmit(f){
     au.step='otp';route();const i=$('#auth-in');if(i)i.focus();
   }else{
     if((d.otp||'').trim()!=='1234')return aerr('That code is not right. Use 1234 in this demo.','otp');
-    if(au.mode==='signup')S.users[au.phone]={user:{name:au.name,phone:fmtPh(au.phone),email:'',notify:true,remind:true},fav:[],bookings:[]};
+    if(au.mode==='signup')S.users[au.phone]={user:{name:au.name,phone:fmtPh(au.phone),email:'',notify:true,remind:true,offers:true,since:new Date().toISOString()},fav:[],bookings:[]};
     loginAs(au.phone);
   }
 }
@@ -458,6 +552,12 @@ function icsFor(b){const s=salon(b.salon),pr=price(s,b.svc);const st=b.date.repl
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
   if(a==='closeScrim'){if(e.target===t)closeSheet();return}
+  if(a==='editprofile'){profileSheet();return}
+  if(a==='rmphoto'){pfPhoto='';const b=$('#pf-av');if(b)b.innerHTML=avatarHTML({name:S.user.name},'lg');return}
+  if(a==='chphone'){cp={step:1,phone:''};phoneSheet();return}
+  if(a==='chphone-back'){cp.step=1;phoneSheet();return}
+  if(a==='deleteacct'){deleteSheet();return}
+  if(a==='dodelete'){doDelete();return}
   if(a==='loc'){locSheet();return}
   if(a==='setarea'){S.area=t.dataset.v;save();closeSheet();toast('Showing salons near '+S.area,'pin');route();return}
   if(a==='pnew'){partnerDone=null;route();return}
@@ -498,7 +598,7 @@ document.addEventListener('click',e=>{
   if(a==='star'){window._rt.v=+t.dataset.v;rateSheet();return}
   if(a==='dorate'){S.bookings.find(x=>x.ref===window._rt.ref).rated=window._rt.v;save();closeSheet();toast('Thanks for your review','star');route();return}
   if(a==='ics'){const b=S.bookings.find(x=>x.ref===t.dataset.ref);const url=URL.createObjectURL(new Blob([icsFor(b)],{type:'text/calendar'}));const l=document.createElement('a');l.href=url;l.download='maison-'+b.ref+'.ics';l.click();URL.revokeObjectURL(url);return}
-  if(a==='pref'){S.user[t.dataset.k]=!S.user[t.dataset.k];save();t.setAttribute('aria-checked',!!S.user[t.dataset.k]);return}
+  if(a==='pref'){const k=t.dataset.k,cur=k==='offers'?S.user.offers!==false:!!S.user[k];S.user[k]=!cur;save();t.setAttribute('aria-checked',!cur);return}
   if(a==='reset'){localStorage.removeItem(KEY);location.hash='#/';location.reload();return}
   if(a==='setf'){const k=t.dataset.k,cur=parseQS()[k];setQS({[k]:cur===t.dataset.v?'':t.dataset.v});return}
   if(a==='rmf'){setQS({[t.dataset.k]:''});return}
@@ -509,8 +609,9 @@ function rsSheet(s){const r=window._rs;const sl=slotsFor(s,r.date);
   sheet(`<h2>Reschedule</h2><p class="muted" style="margin-bottom:14px">${esc(s.name)} will confirm the new time.</p><div class="days" role="group" aria-label="Date">${Array.from({length:10},(_,i)=>{const d=addDays(i),k=iso(d);return `<button class="day" data-act="rsday" data-v="${k}" aria-pressed="${r.date===k}" ${d.getDay()===0?'disabled':''}><small>${i===0?'Today':d.toLocaleDateString('en-IN',{weekday:'short'})}</small><b>${d.getDate()}</b></button>`}).join('')}</div><div class="slotgrid" style="margin:16px 0">${sl.map(x=>`<button class="slot" data-act="rstime" data-v="${x.t}" aria-pressed="${r.time===x.t}" ${x.ok?'':'disabled'}>${tlabel(x.t)}</button>`).join('')}</div><button class="btn btn-primary btn-block ${r.time?'':'disabled'}" data-act="dorsch" ${r.time?'':'disabled'}>Request new time</button>`,'Reschedule appointment')}
 function rateSheet(){const r=window._rt;sheet(`<h2>How was your visit?</h2><p class="muted">Your rating helps others choose.</p><div class="stars" role="group" aria-label="Rating" style="margin:16px 0">${[1,2,3,4,5].map(i=>`<button data-act="star" data-v="${i}" aria-pressed="${r.v>=i}" aria-label="${i} star${i>1?'s':''}">${ic('star')}</button>`).join('')}</div><button class="btn btn-primary btn-block ${r.v?'':'disabled'}" data-act="dorate" ${r.v?'':'disabled'}>Submit review</button>`,'Rate your visit')}
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.act==='range'){const v=+t.value;$('#mx').textContent=v>=6000?'Any':INR(v);t._v=v}if(t.dataset.act==='inp'){draft[t.dataset.k]=t.value;if(draft.step===3){const ok=draft.name.trim().length>1&&/^[+\d][\d\s-]{8,}$/.test(draft.phone.trim());$$('[data-act=bknext]').forEach(b=>{b.disabled=!ok;b.classList.toggle('disabled',!ok)})}}});
-document.addEventListener('change',e=>{const t=e.target;if(t.dataset.act==='range')setQS({max:+t.value>=6000?'':t.value});if(t.dataset.act==='sort')setQS({sort:t.value})});
-document.addEventListener('submit',e=>{const pf=e.target.closest('[data-form="partner"]');if(pf){e.preventDefault();partnerSubmit(pf);return}
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.act==='photo'){handlePhoto(t);return}if(t.dataset.act==='range')setQS({max:+t.value>=6000?'':t.value});if(t.dataset.act==='sort')setQS({sort:t.value})});
+document.addEventListener('submit',e=>{const pf2=e.target.closest('[data-form="profile"],[data-form="chphone"]');if(pf2){e.preventDefault();pf2.dataset.form==='profile'?profileSubmit(pf2):phoneSubmit(pf2);return}
+  const pf=e.target.closest('[data-form="partner"]');if(pf){e.preventDefault();partnerSubmit(pf);return}
   const af=e.target.closest('[data-form="auth"]');if(af){e.preventDefault();authSubmit(af);return}
   const sf=e.target.closest('[data-form="app-sms"]');if(sf){e.preventDefault();const v=(new FormData(sf).get('ph')||'').toString().trim();if(!/^[+\d][\d\s-]{8,}$/.test(v)){toast('Enter a valid mobile number','x');return}toast('Download link sent to '+v);sf.reset();return}
   const f=e.target.closest('[data-form]');if(!f)return;e.preventDefault();const d=Object.fromEntries(new FormData(f));if(f.dataset.form==='home-search')setQS({q:d.q,when:d.when});else setQS({q:d.q})});

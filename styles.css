@@ -613,3 +613,25 @@ select.finput{appearance:auto;padding-right:12px}
 .pcat input:checked+span{background:var(--ink);border-color:var(--ink);color:#fff}
 .pcat input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
 .legal{max-width:760px}.legal h2{font-size:22px;font-weight:700;margin:26px 0 6px}.legal p{line-height:1.7}
+
+/* profile */
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.avatar.has-img{overflow:hidden;background:var(--muted)}
+.avatar.xl{width:104px;height:104px;font-size:36px}
+.me-grid{display:grid;gap:20px}
+.me-col{display:grid;gap:16px;align-content:start;min-width:0}
+.profile-card{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px 22px}
+.profile-card h2{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-top:10px}
+.pc-av{display:grid;place-items:center}
+.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin:18px 0 20px}
+.pc-stats a{display:flex;flex-direction:column;gap:2px;padding:14px 8px;border-radius:14px;background:var(--soft);transition:background .15s}
+.pc-stats a:hover{background:var(--muted)}
+.pc-stats b{font-size:22px;font-weight:800;color:var(--brand)}.pc-stats span{font-size:13px;color:var(--ink-3)}
+.pdl{margin:0;display:grid;gap:0}.pdl>div{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}.pdl>div:last-child{border-bottom:0}
+.pdl dt{color:var(--ink-3);font-size:14px}.pdl dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}.pdl dd.muted{font-weight:400}
+.pf-photo{display:flex;align-items:center;gap:18px;margin:14px 0 4px}
+.pf-photo-btns{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pf-phone{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:0 16px;border:1px solid var(--line-2);border-radius:14px;background:var(--soft);font-weight:600}
+.pf-phone .link{min-height:44px}
+.sheet form .g2f{margin-top:0}
+@media (min-width:960px){.me-grid{grid-template-columns:340px minmax(0,1fr);gap:24px;align-items:start}.profile-card{position:sticky;top:calc(var(--hdr) + 20px)}}
