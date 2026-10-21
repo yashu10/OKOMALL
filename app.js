@@ -121,7 +121,7 @@ function pgHome(){
     <p class="lead">See real availability, pick your professional and your time. No calls, no waiting for a reply — most salons confirm within two hours.</p>
     <form class="searchbox" data-form="home-search" role="search">
       <div class="sfield">${ic('search')}<div style="flex:1"><label for="hq">Service or salon</label><input id="hq" name="q" placeholder="Haircut, facial…" autocomplete="off"></div></div>
-      <div class="sfield">${ic('pin')}<div style="flex:1"><label for="hl">Area</label><select id="hl" name="area"><option>Indiranagar</option><option>Koramangala</option><option>Jayanagar</option><option>HSR Layout</option><option>Whitefield</option></select></div></div>
+      <div class="sfield">${ic('pin')}<div style="flex:1"><label for="hl">Area</label><select id="hl" name="area">${AREAS.map(x=>`<option${x===AREA()?' selected':''}>${x}</option>`).join('')}</select></div></div>
       <div class="sfield">${ic('cal')}<div style="flex:1"><label for="hw">When</label><select id="hw" name="when"><option value="">Any time</option><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="weekend">This weekend</option></select></div></div>
       <button class="btn btn-primary" type="submit">Search</button></form>
     <div class="quick" role="group" aria-label="Quick searches"><a class="chip" href="#/search?when=today">${ic('clock','sm')}Free today</a><a class="chip" href="#/search?max=1000">Under ₹1,000</a><a class="chip" href="#/search?rating=4.8">Top rated</a><a class="chip" href="#/search?offers=1">${ic('tag','sm')}Offers</a><a class="chip" href="#/search?cat=Nails">Nails</a></div>
@@ -131,7 +131,7 @@ function pgHome(){
     <div class="float f2">${rating(4.9)}<div><b>341 reviews</b><div class="xs muted">Élan Beauty Lounge</div></div></div></div></div>
   <div class="wrap"><div class="trust"><div>${ic('clock')}Live availability</div><div>${ic('shield')}Free cancellation up to 4 hrs</div><div>${ic('check')}Verified salons</div><div>${ic('star')}Reviews from real bookings</div></div></div></section>
   <section class="section"><div class="wrap"><div class="sec-head"><div><h2>What are you booking?</h2></div></div><div class="cats">${CATS.map(c=>`<a class="cat" href="#/search?cat=${c.id}"><span class="ico">${ic(c.icon,'lg')}</span>${c.id}<small>${c.n} salons</small></a>`).join('')}</div></div></section>
-  <section class="section"><div class="wrap"><div class="sec-head"><div><h2>Free today near you</h2><p>Tap a time to start booking. Based on Indiranagar, Bengaluru.</p></div><a class="btn-text btn" href="#/search?when=today">See all</a></div><div class="hscroll">${(today.length?today:feat).slice(0,4).map(salonCard).join('')}</div></div></section>
+  <section class="section"><div class="wrap"><div class="sec-head"><div><h2>Free today near you</h2><p>Tap a time to start booking. Based on ${esc(AREA())}, Bengaluru.</p></div><a class="btn-text btn" href="#/search?when=today">See all</a></div><div class="hscroll">${(today.length?today:feat).slice(0,4).map(salonCard).join('')}</div></div></section>
   <section class="section"><div class="wrap"><div class="promo"><span class="deco" aria-hidden="true"></span><div><div class="stamp" aria-hidden="true"><div>UP TO<br>20%<small>off</small></div></div><br><span class="eyebrow" style="background:rgba(255,255,255,.14);color:#fff">${ic('tag','sm')}This week</span><h2 style="margin:14px 0 10px">Offers that apply <em style="font-style:normal;color:#ffd9e2">themselves.</em></h2><p>Salon-funded discounts are applied automatically at the review step. No codes to remember.</p><a class="btn btn-primary" href="#/offers" style="margin-top:20px">Explore all offers ${ic('chev','sm')}</a></div>
     <div class="offers-row">${SALONS.filter(s=>s.offer).slice(0,3).map(s=>`<a class="offer" href="#/salon/${s.id}"><span class="th">${cover(s,0)}</span><span class="tx"><b>${s.offer.type==='pct'?s.offer.v+'% off':s.offer.type==='flat'?INR(s.offer.v)+' off':'Free add-on'}</b><strong style="font-weight:600">${esc(s.name)}</strong><span class="small">${esc(s.offer.label)}</span></span></a>`).join('')}</div></div></div></section>
   <section class="section"><div class="wrap"><div class="sec-head"><div><h2>Top rated this month</h2><p>Highest reviewed by customers who actually visited.</p></div></div><div class="hscroll">${top.map(salonCard).join('')}</div></div></section>
@@ -155,7 +155,7 @@ function pgHome(){
   <section class="section" id="faq" aria-labelledby="faqh"><div class="wrap faq-wrap"><div class="faq-intro"><span class="eyebrow">${ic('help','sm')}FAQ</span><h2 id="faqh">Questions, answered</h2><p class="muted">Everything you need to know before your first booking.</p>
     <div class="faq-help"><div class="fh-ic">${ic('help')}</div><div><b>Still have a question?</b><p class="small muted">Our support team replies within a few hours, 9am–9pm.</p></div><a class="btn btn-ghost btn-sm" href="#/help">Help centre ${ic('chev','sm')}</a></div></div>
     <div class="faq">${FAQS.map((f,i)=>`<details${i===0?' open':''}><summary><span class="q-n">${String(i+1).padStart(2,'0')}</span><span class="q-t">${f[0]}</span><span class="q-i" aria-hidden="true"></span></summary><div class="q-a"><p>${f[1]}</p></div></details>`).join('')}</div></div></section>
-  <section class="section"><div class="wrap"><div class="owner"><div><h2>Own a salon? Fill your empty chairs.</h2><p>List your salon on OKOMALL, manage bookings from one calendar and reach thousands of new customers in Bengaluru.</p></div><a class="btn btn-primary" href="mailto:partners@okomall.app">List your salon ${ic('chev','sm')}</a></div></div></section>`;
+  <section class="section"><div class="wrap"><div class="owner"><div><h2>Own a salon? Fill your empty chairs.</h2><p>List your salon on OKOMALL, manage bookings from one calendar and reach thousands of new customers in Bengaluru.</p></div><a class="btn btn-primary" href="#/partner">List your salon ${ic('chev','sm')}</a></div></div></section>`;
 }
 
 function parseQS(){const q=location.hash.split('?')[1]||'';return Object.fromEntries(new URLSearchParams(q))}
@@ -170,7 +170,8 @@ function filtered(q){
       if(!dates.some(d=>slotsFor(s,d).some(x=>x.ok)))return false}
     return true});
   const so=q.sort||'rec';
-  r.sort((a,b)=>so==='near'?a.km-b.km:so==='price'?a.from-b.from:so==='rating'?b.rating-a.rating:(b.rating*Math.log(b.reviews+2)-a.rating*Math.log(a.reviews+2)));
+  const here=s=>s.area===AREA()?1:0,score=s=>s.rating*Math.log(s.reviews+2)+here(s)*8;
+  r.sort((a,b)=>so==='near'?(here(b)-here(a))||(a.km-b.km):so==='price'?a.from-b.from:so==='rating'?b.rating-a.rating:score(b)-score(a));
   return r;
 }
 function filterUI(q){
@@ -191,7 +192,7 @@ function pgSearch(){
   const q=parseQS(), list=filtered(q), n=list.length;
   const title=q.cat?q.cat+' salons':q.q?`Results for “${esc(q.q)}”`:'Find a salon';
   const chips=Object.entries(q).filter(([k])=>k!=='sort').map(([k,v])=>`<button class="chip on" data-act="rmf" data-k="${k}" aria-label="Remove filter ${k} ${v}">${esc(({max:'Under ₹'+v,rating:v+'★+',offers:'Offers',when:v,cat:v,q:'“'+v+'”'})[k]||v)}${ic('x','sm')}</button>`).join('');
-  return `<div class="wrap"><div class="page-head"><h1>${title}</h1><p class="muted">${n} ${n===1?'salon':'salons'} near Indiranagar, Bengaluru</p>
+  return `<div class="wrap"><div class="page-head"><h1>${title}</h1><p class="muted">${n} ${n===1?'salon':'salons'} near ${esc(AREA())}, Bengaluru</p>
   <form class="sbar" data-form="search" role="search"><input name="q" value="${esc(q.q||'')}" placeholder="Search services or salons" aria-label="Search services or salons">${ic('search')}<button class="btn btn-primary btn-sm" type="submit">Search</button></form></div>
   <div class="toolbar" role="group" aria-label="Filters"><button class="chip mobile-btn" data-act="openFilters">${ic('filter','sm')}Filters</button>${CATS.map(c=>`<button class="chip mob" data-act="setf" data-k="cat" data-v="${c.id}" aria-pressed="${q.cat===c.id}">${c.id}</button>`).join('')}<button class="chip mob" data-act="setf" data-k="when" data-v="today" aria-pressed="${q.when==='today'}">Today</button><button class="chip mob" data-act="setf" data-k="offers" data-v="1" aria-pressed="${q.offers==='1'}">Offers</button>
    <select class="chip" data-act="sort" aria-label="Sort by" style="padding-right:10px"><option value="rec" ${q.sort==='rec'||!q.sort?'selected':''}>Recommended</option><option value="near" ${q.sort==='near'?'selected':''}>Nearest</option><option value="price" ${q.sort==='price'?'selected':''}>Price: low to high</option><option value="rating" ${q.sort==='rating'?'selected':''}>Top rated</option></select></div>
@@ -323,7 +324,7 @@ function pgAuth(mode){
     <div class="row between small" style="margin-top:14px"><button type="button" class="link" data-act="auchange">Change number</button><button type="button" class="link" data-act="auresend">Resend code</button></div></form>`
    :`<form data-form="auth" novalidate>${su?`<label class="flabel" for="auth-name">Full name</label><input id="auth-name" class="finput" name="name" autocomplete="name" placeholder="e.g. Ananya Kapoor" value="${esc(au.name)}">`:''}
     <label class="flabel" for="auth-in">Mobile number</label><div class="phone-in"><span>+91</span><input id="auth-in" name="ph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" value="${esc(au.phone)}" aria-describedby="auth-err"></div>
-    ${su?`<label class="check"><input type="checkbox" name="terms"><span>I agree to the <a href="#/help" class="ul">Terms</a> and <a href="#/help" class="ul">Privacy Policy</a></span></label>`:''}
+    ${su?`<label class="check"><input type="checkbox" name="terms"><span>I agree to the <a href="#/terms" class="ul">Terms</a> and <a href="#/privacy" class="ul">Privacy Policy</a></span></label>`:''}
     <div id="auth-err" class="ferr" role="alert" hidden></div>
     <button class="btn btn-primary btn-block" type="submit" style="margin-top:16px">Send code</button></form>
     <div class="or"><span>or</span></div>
@@ -363,12 +364,63 @@ function loginAs(p){
 }
 function doLogout(){save();S.cur=null;S.user=GUEST();S.fav=[];S.bookings=[];draft=null;bTab='upcoming';save();au=fresh();closeSheet();toast('You have been logged out','logout');if(location.hash==='#/'||location.hash==='')route();else location.hash='#/'}
 
+/* ---------- area, partner, legal ---------- */
+const AREAS=['Indiranagar','Koramangala','Jayanagar','HSR Layout','Whitefield','Malleshwaram'];
+const AREA=()=>(S.area&&AREAS.includes(S.area))?S.area:'Indiranagar';
+const LEADS_KEY='okomall.leads';
+let partnerDone=null;
+function locSheet(){
+  sheet(`<h2>Choose your area</h2><p class="muted" style="margin:4px 0 16px">Salons in your area are shown first.</p>
+  <div class="arealist">${AREAS.map(a=>`<button class="arearow ${a===AREA()?'on':''}" data-act="setarea" data-v="${a}" aria-pressed="${a===AREA()}"><span>${ic('pin','sm')}${a}</span>${a===AREA()?ic('check','sm'):'<i></i>'}</button>`).join('')}</div>`,'Choose your area');
+}
+function pgPartner(){
+  if(partnerDone){return `<div class="wrap" style="padding-top:26px;max-width:720px"><div class="success"><div class="tick">${ic('check')}</div><h1 class="serif" style="font-size:clamp(30px,6vw,44px);line-height:1.08">Thanks — we have your request</h1><p class="muted" style="margin-top:8px">Our partner team will call you within one working day to verify your salon and set up your calendar.</p><div class="note brand" style="margin:22px auto 0;max-width:420px;text-align:left">${ic('info','sm')}<div>Reference <b style="font-family:ui-monospace,monospace">${partnerDone}</b></div></div><div class="row" style="gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap"><a class="btn btn-primary" href="#/">Back to home</a><button class="btn btn-ghost" data-act="pnew">Add another salon</button></div></div></div>`}
+  const perks=[['cal','Live calendar','Manage every chair, service and time slot from one place.'],['user','New customers','Be found by people searching for salons near you every day.'],['clock','Fewer no-shows','Reminders and easy rescheduling keep your chairs full.'],['star','Verified reviews','Only customers who actually visited can review your salon.'],['tag','Offers you control','Run salon-funded offers that apply automatically at checkout.'],['shield','Free to get started','No setup fee and no long contract. We only succeed when you do.']];
+  const steps=[['Apply','Tell us about your salon in two minutes.'],['Get verified','We call you, check details and add your services.'],['Start receiving bookings','Go live and manage requests from your phone.']];
+  const faq=[['How much does it cost?','Listing is free to get started. Commercial terms are shared by the partner team during verification.'],['Do I need special software?','No. Bookings and your calendar are managed from a phone or laptop browser.'],['Can I keep taking walk-ins?','Yes. You decide which slots are open online, so walk-ins and online bookings can sit side by side.']];
+  return `<section class="phero"><div class="wrap phero-in"><div><span class="eyebrow" style="background:rgba(255,255,255,.14);color:#fff">${ic('sparkle','sm')}For salon owners</span><h1>Fill your empty chairs.</h1><p>List your salon on OKOMALL, manage bookings from one calendar and reach new customers in Bengaluru.</p><a class="btn btn-primary" href="#apply" data-act="jump" data-to="apply">Apply now ${ic('chev','sm')}</a></div></div></section>
+  <section class="section"><div class="wrap"><div class="sec-head"><div><h2>Why list with OKOMALL</h2></div></div><div class="perks">${perks.map(p=>`<div class="perk"><span class="ico">${ic(p[0],'lg')}</span><h3>${p[1]}</h3><p class="small muted">${p[2]}</p></div>`).join('')}</div></div></section>
+  <section class="section"><div class="wrap"><div class="sec-head"><div><h2>How it works</h2></div></div><div class="steps">${steps.map((s,i)=>`<div class="step"><div class="n">${i+1}</div><h3>${s[0]}</h3><p class="small muted">${s[1]}</p></div>`).join('')}</div></div></section>
+  <section class="section" id="apply"><div class="wrap pform-wrap"><div class="pform-intro"><h2>Apply to list your salon</h2><p class="muted">It takes about two minutes. We never share your details.</p></div>
+  <form class="card pform" data-form="partner" novalidate>
+   <div class="g2f"><div><label class="flabel" for="pf-salon">Salon name</label><input id="pf-salon" class="finput" name="salon" autocomplete="organization" placeholder="e.g. Luma Hair Studio"></div>
+   <div><label class="flabel" for="pf-owner">Your name</label><input id="pf-owner" class="finput" name="owner" autocomplete="name" placeholder="Owner or manager"></div></div>
+   <div class="g2f"><div><label class="flabel" for="pf-ph">Mobile number</label><div class="phone-in"><span>+91</span><input id="pf-ph" name="ph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210"></div></div>
+   <div><label class="flabel" for="pf-email">Email</label><input id="pf-email" class="finput" name="email" type="email" autocomplete="email" placeholder="you@salon.com"></div></div>
+   <div class="g2f"><div><label class="flabel" for="pf-area">Area</label><select id="pf-area" class="finput" name="area">${AREAS.map(a=>`<option>${a}</option>`).join('')}<option>Other</option></select></div>
+   <div><label class="flabel" for="pf-team">Team size</label><select id="pf-team" class="finput" name="team"><option>Just me</option><option>2–4 people</option><option>5–10 people</option><option>More than 10</option></select></div></div>
+   <fieldset class="pcats"><legend class="flabel">What do you offer?</legend><div class="pcat-list">${CATS.map(c=>`<label class="pcat"><input type="checkbox" name="cat" value="${c.id}"><span>${c.id}</span></label>`).join('')}</div></fieldset>
+   <label class="check"><input type="checkbox" name="terms"><span>I agree to the <a href="#/terms" class="ul">Terms</a> and <a href="#/privacy" class="ul">Privacy Policy</a></span></label>
+   <div id="pf-err" class="ferr" role="alert" hidden></div>
+   <button class="btn btn-primary btn-block" type="submit" style="margin-top:18px">Submit application</button></form></div></section>
+  <section class="section"><div class="wrap faq-wrap"><div class="faq-intro"><h2>Partner questions</h2><p class="muted">Quick answers before you apply.</p></div><div class="faq">${faq.map((f,i)=>`<details${i===0?' open':''}><summary><span class="q-t">${f[0]}</span><span class="q-i" aria-hidden="true"></span></summary><div class="q-a"><p style="padding-left:0">${f[1]}</p></div></details>`).join('')}</div></div></section>`;
+}
+function partnerSubmit(f){
+  const d=Object.fromEntries(new FormData(f)),cats=new FormData(f).getAll('cat');
+  const err=(m,field)=>{const e=$('#pf-err');e.textContent=m;e.hidden=false;const x=field&&f.querySelector('[name="'+field+'"]');if(x){x.setAttribute('aria-invalid','true');x.focus()}};
+  $$('[aria-invalid]',f).forEach(x=>x.removeAttribute('aria-invalid'));
+  if((d.salon||'').trim().length<2)return err('Please enter your salon name.','salon');
+  if((d.owner||'').trim().length<2)return err('Please enter your name.','owner');
+  if(!/^[6-9]\d{9}$/.test(k10(d.ph)))return err('Enter a valid 10-digit mobile number.','ph');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((d.email||'').trim()))return err('Enter a valid email address.','email');
+  if(!cats.length)return err('Select at least one service category.');
+  if(!d.terms)return err('Please accept the Terms to continue.','terms');
+  const ref='LST-'+(10000+Math.floor(Math.random()*89999));
+  try{const all=JSON.parse(localStorage.getItem(LEADS_KEY)||'[]');all.push({ref,salon:d.salon.trim(),owner:d.owner.trim(),phone:fmtPh(k10(d.ph)),email:d.email.trim(),area:d.area,team:d.team,cats,at:new Date().toISOString()});localStorage.setItem(LEADS_KEY,JSON.stringify(all))}catch(e){}
+  partnerDone=ref;route();
+}
+function pgLegal(kind){
+  const T={terms:['Terms of use',[['Using OKOMALL','OKOMALL helps you discover salons, view live availability and request appointments. By using the service you agree to these terms.'],['Bookings','A booking is a request to the salon until it is confirmed. Prices shown are set by each salon. You pay the salon directly after your service; nothing is charged online.'],['Cancellation policy','You can cancel or reschedule free of charge up to 4 hours before your appointment from My appointments. Later cancellations may affect your booking priority with that salon.'],['Reviews','Only customers with a completed booking can leave a review. We may remove reviews that are abusive or not about a real visit.'],['Your account','Keep your login details safe. You are responsible for activity on your account.']]],
+   privacy:['Privacy policy',[['What we collect','Your name, mobile number, email (optional), the bookings you make and the salons you save.'],['How we use it','To show your appointments, send confirmations and reminders, and let salons prepare for your visit. We do not sell your personal data.'],['Who can see it','The salon you book with sees your name, phone number and appointment details. Nobody else does.'],['Your choices','You can change notification preferences in Account settings and ask us to delete your account at support@okomall.app.'],['This demo','In this demo site, data is stored only in your own browser and can be cleared from Account settings.']]]}[kind];
+  return `<div class="wrap legal" style="padding-top:26px"><h1 class="serif" style="font-size:clamp(34px,6vw,52px);line-height:1.05">${T[0]}</h1><p class="muted" style="margin:6px 0 26px">Last updated 1 October 2026</p>${T[1].map(s=>`<section id="${s[0].toLowerCase().replace(/\s+/g,'-')}"><h2>${s[0]}</h2><p class="muted">${s[1]}</p></section>`).join('')}<p style="margin-top:28px"><a class="btn btn-ghost" href="#/help">Questions? Visit help centre</a></p></div>`;
+}
+
 /* ---------- shell ---------- */
 function chrome(route){
   const links=[['#/search','Explore','search'],['#/offers','Offers','tag'],['#/bookings','My appointments','cal'],['#/help','Help','help']];
   const cur=r=>route.startsWith(r.slice(2).split('?')[0])&&r.length>2;
   $('#hdr').innerHTML=`<div class="wrap"><a class="logo" href="#/" aria-label="OKOMALL home"><svg class="logo-mark" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true" focusable="false"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a3d59"/><stop offset="1" stop-color="#5e2236"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg1)"/><circle cx="19.5" cy="21.5" r="8.6" fill="none" stroke="#fff" stroke-width="3.8"/><path d="M30.2 6.6l1.3 3.3 3.3 1.3-3.3 1.3-1.3 3.3-1.3-3.3-3.300-1.3 3.300-1.3z" fill="#ffd9e2"/></svg><span class="logo-word">OKO<b>MALL</b></span></a><nav class="nav" aria-label="Main">${links.map(l=>`<a href="${l[0]}" ${cur(l[0])?'aria-current="page"':''}>${l[1]}</a>`).join('')}</nav>
-  <div class="hdr-end"><button class="loc" aria-label="Change location">${ic('pin','sm')}Bengaluru</button><a class="icon-btn" href="#/saved" aria-label="Saved salons">${ic('heart')}</a>${authBits()}</div></div>`;
+  <div class="hdr-end"><button class="loc" data-act="loc" aria-haspopup="dialog" aria-label="Change area, currently ${esc(AREA())}">${ic('pin','sm')}<span class="loc-t">${esc(AREA())}</span></button><a class="icon-btn" href="#/saved" aria-label="Saved salons">${ic('heart')}</a>${authBits()}</div></div>`;
   const tabs=[['#/','Home','home',route===''],['#/search','Explore','search',route.startsWith('search')],['#/bookings','Bookings','cal',route.startsWith('bookings')],['#/saved','Saved','heart',route.startsWith('saved')],['#/me',S.cur?'Me':'Log in','user',route.startsWith('me')||route.startsWith('login')||route.startsWith('signup')]];
   $('#tabbar').innerHTML=tabs.map(t=>`<a href="${t[0]}" ${t[3]?'aria-current="page"':''}>${ic(t[2])}${t[1]}</a>`).join('');
   const focusFlow=route.startsWith('book/')||route.startsWith('booked/')||route.startsWith('salon/')||route.startsWith('login')||route.startsWith('signup');
@@ -383,8 +435,9 @@ function route(){
    }else if(a0==='login'||a0==='signup'){location.replace(safeNext(parseQS().next));return}}
   const h=location.hash.replace(/^#\/?/,'');const [path]=h.split('?');const [a,b]=path.split('/');
   chrome(path);const app=$('#app');
-  const views={'':()=>pgHome(),search:()=>pgSearch(),salon:()=>pgSalon(b),book:()=>pgBook(b),booked:()=>pgBooked(b),bookings:pgBookings,saved:pgSaved,offers:pgOffers,help:pgHelp,me:pgMe,login:()=>pgAuth('login'),signup:()=>pgAuth('signup')};
-  const titles={'':'OKOMALL — book beauty in a minute',search:'Find a salon · OKOMALL',salon:(salon(b)||{}).name,book:'Book · OKOMALL',booked:'Request sent · OKOMALL',bookings:'My appointments · OKOMALL',saved:'Saved · OKOMALL',offers:'Offers · OKOMALL',help:'Help · OKOMALL',me:'Account · OKOMALL',login:'Log in · OKOMALL',signup:'Sign up · OKOMALL'};
+  if(a!=='partner')partnerDone=null;
+  const views={'':()=>pgHome(),search:()=>pgSearch(),salon:()=>pgSalon(b),book:()=>pgBook(b),booked:()=>pgBooked(b),bookings:pgBookings,saved:pgSaved,offers:pgOffers,help:pgHelp,me:pgMe,login:()=>pgAuth('login'),signup:()=>pgAuth('signup'),partner:pgPartner,terms:()=>pgLegal('terms'),privacy:()=>pgLegal('privacy')};
+  const titles={'':'OKOMALL — book beauty in a minute',search:'Find a salon · OKOMALL',salon:(salon(b)||{}).name,book:'Book · OKOMALL',booked:'Request sent · OKOMALL',bookings:'My appointments · OKOMALL',saved:'Saved · OKOMALL',offers:'Offers · OKOMALL',help:'Help · OKOMALL',me:'Account · OKOMALL',login:'Log in · OKOMALL',signup:'Sign up · OKOMALL',partner:'List your salon · OKOMALL',terms:'Terms of use · OKOMALL',privacy:'Privacy policy · OKOMALL'};
   if(!(a in views)){app.innerHTML=nf();return}
   const heavy=['search','salon'].includes(a)&&!busy;
   const paint=()=>{app.innerHTML=views[a]();document.title=(titles[a]||'OKOMALL')+((a==='salon')?' · OKOMALL':'');if(!location.hash.includes('#keep'))window.scrollTo(0,0);app.focus({preventScroll:true});if(a==='salon')spy();busy=false};
@@ -405,6 +458,9 @@ function icsFor(b){const s=salon(b.salon),pr=price(s,b.svc);const st=b.date.repl
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
   if(a==='closeScrim'){if(e.target===t)closeSheet();return}
+  if(a==='loc'){locSheet();return}
+  if(a==='setarea'){S.area=t.dataset.v;save();closeSheet();toast('Showing salons near '+S.area,'pin');route();return}
+  if(a==='pnew'){partnerDone=null;route();return}
   if(a==='rvnav'){const r=$('#rvs');if(r)r.scrollBy({left:+t.dataset.d*Math.min(r.clientWidth*.85,700),behavior:'smooth'});return}
   if(a==='umenu'){const m=$('#umenu');if(m){const open=m.hidden;m.hidden=!open;t.setAttribute('aria-expanded',open)}return}
   if(a==='logout'){const m=$('#umenu');if(m)m.hidden=true;sheet(`<h2>Log out?</h2><p class="muted" style="margin:6px 0 20px">You will need to log in again to see your appointments and saved salons.</p><div class="row" style="gap:10px"><button class="btn btn-ghost" style="flex:1" data-act="closeSheet">Stay logged in</button><button class="btn btn-primary" style="flex:1" data-act="dologout">Log out</button></div>`,'Log out');return}
@@ -454,7 +510,8 @@ function rsSheet(s){const r=window._rs;const sl=slotsFor(s,r.date);
 function rateSheet(){const r=window._rt;sheet(`<h2>How was your visit?</h2><p class="muted">Your rating helps others choose.</p><div class="stars" role="group" aria-label="Rating" style="margin:16px 0">${[1,2,3,4,5].map(i=>`<button data-act="star" data-v="${i}" aria-pressed="${r.v>=i}" aria-label="${i} star${i>1?'s':''}">${ic('star')}</button>`).join('')}</div><button class="btn btn-primary btn-block ${r.v?'':'disabled'}" data-act="dorate" ${r.v?'':'disabled'}>Submit review</button>`,'Rate your visit')}
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.act==='range'){const v=+t.value;$('#mx').textContent=v>=6000?'Any':INR(v);t._v=v}if(t.dataset.act==='inp'){draft[t.dataset.k]=t.value;if(draft.step===3){const ok=draft.name.trim().length>1&&/^[+\d][\d\s-]{8,}$/.test(draft.phone.trim());$$('[data-act=bknext]').forEach(b=>{b.disabled=!ok;b.classList.toggle('disabled',!ok)})}}});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset.act==='range')setQS({max:+t.value>=6000?'':t.value});if(t.dataset.act==='sort')setQS({sort:t.value})});
-document.addEventListener('submit',e=>{const af=e.target.closest('[data-form="auth"]');if(af){e.preventDefault();authSubmit(af);return}
+document.addEventListener('submit',e=>{const pf=e.target.closest('[data-form="partner"]');if(pf){e.preventDefault();partnerSubmit(pf);return}
+  const af=e.target.closest('[data-form="auth"]');if(af){e.preventDefault();authSubmit(af);return}
   const sf=e.target.closest('[data-form="app-sms"]');if(sf){e.preventDefault();const v=(new FormData(sf).get('ph')||'').toString().trim();if(!/^[+\d][\d\s-]{8,}$/.test(v)){toast('Enter a valid mobile number','x');return}toast('Download link sent to '+v);sf.reset();return}
   const f=e.target.closest('[data-form]');if(!f)return;e.preventDefault();const d=Object.fromEntries(new FormData(f));if(f.dataset.form==='home-search')setQS({q:d.q,when:d.when});else setQS({q:d.q})});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal').innerHTML)closeSheet()});

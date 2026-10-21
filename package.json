@@ -1,0 +1,14 @@
+{
+  "name": "okomall",
+  "version": "1.0.0",
+  "description": "OKOMALL — salon & beauty booking website (static, no build step)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tests/serve.mjs",
+    "test": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}
